@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Educational Games</title>
+    <style>body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+#global-header {
+    width: 90%;
+    max-width: 500px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.game-view {
+    width: 90%;
+    max-width: 500px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* =========================================================================
+   COMMON BUTTON STYLES (Refactored)
+   ========================================================================= */
+
+#game-mode-switch, #lang-switch, #add-settings-btn, #skip-btn, #category-switch, .btn,
+#retry-button, #so-skip-button, #add-retry-button, #add-skip-button, #sub-retry-button, #sub-skip-button, 
+#sa-retry-button, #sa-skip-button, #settings-save-btn, #settings-close-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s, transform 0.1s;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: white; /* Most buttons use white text */
+}
+
+/* Button sizing and effects */
+.btn-large, #retry-button, #so-skip-button, #add-retry-button, #add-skip-button, #sub-retry-button, #sub-skip-button, #sa-retry-button, #sa-skip-button {
+    font-size: 1.2em;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn:active, 
+#game-mode-switch:active, #lang-switch:active, #add-settings-btn:active, #skip-btn:active, #category-switch:active,
+.btn-large:active, #retry-button:active, #so-skip-button:active, #add-retry-button:active, #add-skip-button:active, #sub-retry-button:active, #sub-skip-button:active, 
+#sa-retry-button:active, #sa-skip-button:active {
+    transform: scale(0.98);
+}
+
+/* Specific Button Colors */
+.btn-success, #game-mode-switch, #lang-switch, #skip-btn, #category-switch, #settings-save-btn {
+    background-color: #4CAF50;
+}
+.btn-success:hover, #game-mode-switch:hover, #lang-switch:hover, #skip-btn:hover, #category-switch:hover, #settings-save-btn:hover {
+    background-color: #45a049;
+}
+
+.btn-warning, #retry-button, #add-retry-button, #sub-retry-button, #sa-retry-button {
+    background-color: #ff9800;
+}
+.btn-warning:hover, #retry-button:hover, #add-retry-button:hover, #sub-retry-button:hover, #sa-retry-button:hover {
+    background-color: #f57c00;
+}
+
+.btn-info, #add-settings-btn, #so-skip-button, #add-skip-button, #sub-skip-button, #sa-skip-button {
+    background-color: #2196F3;
+}
+.btn-info:hover, #add-settings-btn:hover, #so-skip-button:hover, #add-skip-button:hover, #sub-skip-button:hover, #sa-skip-button:hover {
+    background-color: #1976D2;
+}
+
+.btn-danger, #settings-close-btn {
+    background-color: #f44336;
+}
+.btn-danger:hover, #settings-close-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* ========================================================================= */
+
+#category-switch {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+    padding-right: 35px;
+}
+
+#question-container {
+    margin-bottom: 20px;
+}
+
+#question, #sa-question {
+    font-size: 1.5em;
+    line-height: 1.5;
+}
+
+/* =========================================================================
+   MULTIPLE CHOICE STYLES
+   ========================================================================= */
+
+.choice {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    text-align: left;
+}
+
+.choice.correct {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+    animation: tada 0.8s;
+}
+
+.choice.wrong {
+    background-color: #f44336;
+    color: white;
+    border-color: #f44336;
+    animation: shake 0.8s;
+}
+
+@keyframes tada {
+    0% {transform: scale(1);}
+    10%, 20% {transform: scale(0.9) rotate(-3deg);}
+    30%, 50%, 70%, 90% {transform: scale(1.1) rotate(3deg);}
+    40%, 60%, 80% {transform: scale(1.1) rotate(-3deg);}
+    100% {transform: scale(1) rotate(0);}
+}
+
+/* =========================================================================
+   SENTENCE ORDER STYLES
+   ========================================================================= */
+
+.sentence-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 15px;
+}
+
+#scrambled-sentence {
+    background-color: #ffffff;
+    border: 2px dashed #a2d2ff;
+}
+
+#answer-container {
+    background-color: #e0f7fa;
+    border: 2px solid #4fc3f7;
+    min-height: 50px;
+}
+
+.word-block {
+    background-color: #ffc947;
+    color: #333;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.2s ease;
+    box-sizing: border-box;
+    white-space: nowrap;
+    touch-action: none;
+}
+
+.word-block.placeholder {
+    background-color: transparent;
+    border: 2px dashed #ccc;
+    box-shadow: none;
+}
+
+.word-block:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+    background-color: #ffb600;
+}
+
+#button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* =========================================================================
+   COMMON FEEDBACK & ANIMATIONS (Refactored)
+   ========================================================================= */
+
+#feedback, #add-feedback, #sub-feedback, #sa-feedback, .feedback {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 10px;
+    min-height: 30px;
+    text-align: center;
+}
+
+.correct {
+    color: #4CAF50;
+}
+
+.incorrect {
+    color: #f44336;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.shake, .sa-shake, .mc-shake {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+}
+
+/* =========================================================================
+   ADDITION GAME STYLES
+   ========================================================================= */
+
+#add-board, #sub-board {
+    font-family: monospace;
+    font-size: 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.math-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin: 5px 0;
+    align-items: center;
+}
+
+.math-digits {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.math-digit, .operator {
+    width: 35px;
+    text-align: center;
+    display: inline-block;
+}
+
+.operator {
+    width: 35px;
+    text-align: center;
+    display: inline-block;
+}
+
+.math-divider {
+    width: 100%;
+    border: 0;
+    border-bottom: 3px solid #333;
+    margin: 10px 0;
+}
+
+.answer-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+/* =========================================================================
+   COMMON INPUT STYLES (Refactored)
+   ========================================================================= */
+
+.digit-input, .sa-digit-input {
+    width: 35px;
+    height: 45px;
+    font-size: 1em;
+    font-family: monospace;
+    text-align: center;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    /* iOS specific resets to prevent invisible text */
+    padding: 0;
+    line-height: normal;
+    color: #000;
+    box-shadow: none;
+    -webkit-appearance: none;
+    /* Remove arrows in number input */
+    -moz-appearance: textfield;
+}
+
+.sa-digit-input {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5em;
+    font-family: sans-serif;
+}
+
+.digit-input::-webkit-outer-spin-button,
+.digit-input::-webkit-inner-spin-button,
+.sa-digit-input::-webkit-outer-spin-button,
+.sa-digit-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.digit-input:focus, .sa-digit-input:focus {
+    border-color: #4CAF50;
+    outline: none;
+    background-color: #e8f5e9;
+}
+
+#sa-answer-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* =========================================================================
+   MODAL STYLES
+   ========================================================================= */
+
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.setting-row {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-row input {
+    width: 50px;
+    padding: 5px;
+    font-size: 1em;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* =========================================================================
+   SUBMIT BUTTON STYLES
+   ========================================================================= */
+
+.submit-btn {
+    width: 45px;
+    height: 45px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.submit-btn:hover {
+    background-color: #45a049;
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.submit-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.submit-btn:focus {
+    outline: none;
+}
+
+#sa-answer-container .submit-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+}
+
+.math-board-wrapper {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin: 0 auto;
+    width: fit-content;
+}
+</style>
+</head>
+<body>
+    <div id="global-header">
+        <select id="game-mode-switch" class="btn btn-success">
+            <option value="multiple_choice">選擇題</option>
+            <option value="sentence_order">句子排序</option>
+            <option value="addition">加法</option>
+            <option value="subtraction">減法</option>
+            <option value="short_answer">文字題</option>
+        </select>
+        <div>
+            <button id="add-settings-btn" class="btn btn-success" style="display: none;">⚙️</button>
+            <button id="lang-switch" class="btn btn-success">English</button>
+        </div>
+    </div>
+
+    <div id="add-settings-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2 id="settings-title">設定</h2>
+            <div class="setting-row">
+                <label id="label-m-digits" for="m-digits-input">加數 1 位數 (m):</label>
+                <input type="number" id="m-digits-input" min="1" max="5" value="3">
+            </div>
+            <div class="setting-row">
+                <label id="label-n-digits" for="n-digits-input">加數 2 位數 (n):</label>
+                <input type="number" id="n-digits-input" min="1" max="5" value="3">
+            </div>
+            <div class="modal-buttons">
+                <button id="settings-save-btn" class="btn btn-success">儲存</button>
+                <button id="settings-close-btn" class="btn btn-danger">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mc-game-container" class="game-view">
+        <div id="header">
+            <select id="category-switch" class="btn btn-success">
+                <option value="measure_words">量詞</option>
+                <option value="general_knowledge">常識</option>
+            </select>
+            <button id="skip-btn" class="btn btn-success">Skip</button>
+        </div>
+        <div id="question-container">
+            <p id="question"></p>
+        </div>
+        <div id="choices-container"></div>
+    </div>
+
+    <div id="so-game-container" class="game-view" style="display: none;">
+        <div id="button-container">
+            <button id="retry-button" class="btn btn-warning btn-large">重試</button>
+            <button id="so-skip-button" class="btn btn-info btn-large">跳過</button>
+        </div>
+        <div id="so-question-container">
+            <div id="scrambled-sentence" class="sentence-container dropzone"></div>
+        </div>
+        <div id="answer-container" class="sentence-container dropzone"></div>
+        <p id="feedback" class="feedback"></p>
+    </div>
+
+    <div id="add-game-container" class="game-view" style="display: none;">
+        <div id="button-container">
+            <button id="add-retry-button" class="btn btn-warning btn-large">重試</button>
+            <button id="add-skip-button" class="btn btn-info btn-large">跳過</button>
+        </div>
+        <div class="math-board-wrapper">
+            <div id="add-board">
+                <div id="add-row-top" class="math-row"></div>
+                <div id="add-row-bottom" class="math-row">
+                    <span class="operator">+</span>
+                    <div id="add-row-bottom-digits" class="math-digits"></div>
+                </div>
+                <hr class="math-divider">
+                <div id="add-row-answer" class="math-row answer-row"></div>
+            </div>
+            <button id="add-submit-btn" class="submit-btn">✓</button>
+        </div>
+        <p id="add-feedback" class="feedback"></p>
+    </div>
+
+    <div id="sub-game-container" class="game-view" style="display: none;">
+        <div id="button-container">
+            <button id="sub-retry-button" class="btn btn-warning btn-large">重試</button>
+            <button id="sub-skip-button" class="btn btn-info btn-large">跳過</button>
+        </div>
+        <div class="math-board-wrapper">
+            <div id="sub-board">
+                <div id="sub-row-top" class="math-row"></div>
+                <div id="sub-row-bottom" class="math-row">
+                    <span class="operator">-</span>
+                    <div id="sub-row-bottom-digits" class="math-digits"></div>
+                </div>
+                <hr class="math-divider">
+                <div id="sub-row-answer" class="math-row answer-row"></div>
+            </div>
+            <button id="sub-submit-btn" class="submit-btn">✓</button>
+        </div>
+        <p id="sub-feedback" class="feedback"></p>
+    </div>
+
+    <div id="sa-game-container" class="game-view" style="display: none;">
+        <div id="button-container">
+            <button id="sa-retry-button" class="btn btn-warning btn-large">重試</button>
+            <button id="sa-skip-button" class="btn btn-info btn-large">跳過</button>
+        </div>
+        <div id="sa-question-container">
+            <p id="sa-question"></p>
+        </div>
+        <div id="sa-answer-container">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="sa-answer-input" class="digit-input sa-digit-input" placeholder="?" />
+            <button id="sa-submit-btn" class="submit-btn">✓</button>
+        </div>
+        <p id="sa-feedback" class="feedback"></p>
+    </div>
+
+    <script>const questionsData = {"en":{"general_knowledge":[{"question":"What animal says 'woof'?","choices":["Cat","Dog","Cow","Bird"],"answer":"Dog"},{"question":"What color is a banana?","choices":["Red","Blue","Yellow","Green"],"answer":"Yellow"},{"question":"What do you wear on your feet?","choices":["Hat","Gloves","Socks","Scarf"],"answer":"Socks"},{"question":"What do you use to brush your teeth?","choices":["Soap","Shampoo","Toothbrush","Towel"],"answer":"Toothbrush"},{"question":"What sound does a cow make?","choices":["Moo","Oink","Baa","Quack"],"answer":"Moo"},{"question":"Where do fish live?","choices":["In trees","In the sky","In water","Underground"],"answer":"In water"},{"question":"What do you do when you're sleepy?","choices":["Run","Jump","Sleep","Eat"],"answer":"Sleep"},{"question":"What color is the sun?","choices":["Blue","Green","Yellow","Purple"],"answer":"Yellow"},{"question":"What has wings and can fly?","choices":["Fish","Dog","Bird","Snake"],"answer":"Bird"},{"question":"What do you eat with a spoon?","choices":["Pizza","Soup","Sandwich","Apple"],"answer":"Soup"},{"question":"What do you see in the sky at night?","choices":["Sun","Rainbow","Moon and stars","Clouds"],"answer":"Moon and stars"},{"question":"Which animal has a long trunk?","choices":["Monkey","Lion","Elephant","Zebra"],"answer":"Elephant"},{"question":"What do you drink when you're thirsty?","choices":["Cookies","Water","Toys","Books"],"answer":"Water"},{"question":"What color are strawberries?","choices":["Blue","Yellow","Red","Orange"],"answer":"Red"},{"question":"What grows on trees?","choices":["Fish","Cars","Apples","Balls"],"answer":"Apples"},{"question":"What do you wear when it's cold?","choices":["Shorts","T-shirt","Jacket","Sandals"],"answer":"Jacket"},{"question":"Which animal says 'oink'?","choices":["Pig","Sheep","Duck","Horse"],"answer":"Pig"},{"question":"What do you play with at the park?","choices":["Bed","Stove","Swing","Sofa"],"answer":"Swing"},{"question":"What color is grass?","choices":["Red","Green","Blue","Purple"],"answer":"Green"},{"question":"What do you read?","choices":["Chair","Table","Book","Lamp"],"answer":"Book"},{"question":"Which animal is known for being 'man's best friend'?","choices":["Cat","Dog","Hamster","Goldfish"],"answer":"Dog"},{"question":"What do bees make?","choices":["Honey","Milk","Bread","Cheese"],"answer":"Honey"},{"question":"How many wheels does a bicycle have?","choices":["One","Two","Three","Four"],"answer":"Two"},{"question":"What do you do at a red traffic light?","choices":["Go","Stop","Slow down","Speed up"],"answer":"Stop"},{"question":"Which shape has three sides?","choices":["Circle","Square","Triangle","Rectangle"],"answer":"Triangle"},{"question":"What do you put on a birthday cake?","choices":["Ketchup","Candles","Mustard","Pickles"],"answer":"Candles"},{"question":"What is the opposite of 'hot'?","choices":["Warm","Cold","Spicy","Sunny"],"answer":"Cold"},{"question":"What animal has stripes?","choices":["Lion","Zebra","Monkey","Hippo"],"answer":"Zebra"},{"question":"What do you use to unlock a door?","choices":["A key","A banana","A shoe","A hat"],"answer":"A key"},{"question":"What is a baby dog called?","choices":["Kitten","Puppy","Cub","Fawn"],"answer":"Puppy"},{"question":"What color are grapes?","choices":["Orange","Purple","Pink","Brown"],"answer":"Purple"},{"question":"What do you use an umbrella for?","choices":["For sun","For rain","For wind","For snow"],"answer":"For rain"},{"question":"Which animal has a very long neck?","choices":["Penguin","Giraffe","Kangaroo","Bear"],"answer":"Giraffe"},{"question":"What do you do with a ball?","choices":["Eat it","Read it","Throw it","Wear it"],"answer":"Throw it"},{"question":"What is the opposite of 'big'?","choices":["Large","Small","Tall","Wide"],"answer":"Small"},{"question":"What do you see after it rains?","choices":["A rainbow","A shadow","A storm","A tunnel"],"answer":"A rainbow"},{"question":"What do you cut paper with?","choices":["A fork","Scissors","A plate","A cup"],"answer":"Scissors"},{"question":"What does a frog say?","choices":["Hiss","Ribbit","Roar","Chirp"],"answer":"Ribbit"},{"question":"What is the number after 2?","choices":["1","3","4","5"],"answer":"3"},{"question":"What do you sit on?","choices":["A window","A ceiling","A chair","A wall"],"answer":"A chair"},{"question":"Which animal is the king of the jungle?","choices":["Tiger","Lion","Giraffe","Bear"],"answer":"Lion"},{"question":"What color are carrots?","choices":["Green","Orange","Purple","White"],"answer":"Orange"},{"question":"What do you do with your eyes?","choices":["Hear","Smell","See","Taste"],"answer":"See"},{"question":"What is frozen water called?","choices":["Steam","Ice","Juice","Milk"],"answer":"Ice"},{"question":"Which of these is a fruit?","choices":["Carrot","Broccoli","Apple","Potato"],"answer":"Apple"},{"question":"What do you write with?","choices":["A spoon","A fork","A pencil","A knife"],"answer":"A pencil"},{"question":"What do you use to call someone?","choices":["A television","A telephone","A refrigerator","A bed"],"answer":"A telephone"},{"question":"What is the opposite of 'happy'?","choices":["Excited","Sad","Angry","Tired"],"answer":"Sad"},{"question":"What animal swims in the ocean and has fins?","choices":["A bird","A fish","A butterfly","A squirrel"],"answer":"A fish"},{"question":"What do you wear on your head?","choices":["A shirt","A hat","Pants","Socks"],"answer":"A hat"}],"measure_words":[{"question":"A ( ) of bread.","choices":["piece","loaf","slice","bar"],"answer":"loaf"},{"question":"A ( ) of water.","choices":["glass","cup","bottle","carton"],"answer":"glass"}]},"zh":{"general_knowledge":[{"question":"哪種動物會'汪汪'叫？","choices":["貓","狗","牛","鳥"],"answer":"狗"},{"question":"香蕉是什麼顏色的？","choices":["紅色","藍色","黃色","綠色"],"answer":"黃色"},{"question":"你腳上穿什麼？","choices":["帽子","手套","襪子","頸巾"],"answer":"襪子"},{"question":"你用什麼來刷牙？","choices":["番梘","洗頭水","牙刷","毛巾"],"answer":"牙刷"},{"question":"牛怎麼叫？","choices":["哞哞","咯咯","咩咩","嘎嘎"],"answer":"哞哞"},{"question":"魚住在哪裡？","choices":["樹上","天上","水裡","地下"],"answer":"水裡"},{"question":"當你睏了，你會做什麼？","choices":["跑步","跳","睡覺","吃飯"],"answer":"睡覺"},{"question":"太陽是什麼顏色的？","choices":["藍色","綠色","黃色","紫色"],"answer":"黃色"},{"question":"什麼東西有翅膀還會飛？","choices":["魚","狗","鳥","蛇"],"answer":"鳥"},{"question":"你用湯匙吃什麼？","choices":["薄餅","湯","三文治","蘋果"],"answer":"湯"},{"question":"晚上你在天上看到什麼？","choices":["太陽","彩虹","月亮和星星","雲"],"answer":"月亮和星星"},{"question":"哪種動物有長長的鼻子？","choices":["猴子","獅子","大象","斑馬"],"answer":"大象"},{"question":"你口渴的時候喝什麼？","choices":["餅乾","水","玩具","書"],"answer":"水"},{"question":"士多啤梨是什麼顏色的？","choices":["藍色","黃色","紅色","橙色"],"answer":"紅色"},{"question":"什麼東西在樹上長？","choices":["魚","車","蘋果","球"],"answer":"蘋果"},{"question":"天氣冷的時候你穿什麼？","choices":["短褲","T恤","外套","涼鞋"],"answer":"外套"},{"question":"哪種動物會'咯咯'叫？","choices":["豬","羊","鴨","馬"],"answer":"豬"},{"question":"你在公園玩什麼？","choices":["床","火爐","鞦韆","沙發"],"answer":"鞦韆"},{"question":"草是什麼顏色的？","choices":["紅色","綠色","藍色","紫色"],"answer":"綠色"},{"question":"你讀什麼？","choices":["椅子","桌子","書","燈"],"answer":"書"},{"question":"哪種動物被稱為'人類最好的朋友'？","choices":["貓","狗","倉鼠","金魚"],"answer":"狗"},{"question":"蜜蜂製造什麼？","choices":["蜂蜜","牛奶","麵包","芝士"],"answer":"蜂蜜"},{"question":"單車有幾個輪子？","choices":["一個","兩個","三個","四個"],"answer":"兩個"},{"question":"遇到紅燈你會怎麼做？","choices":["前進","停","減速","加速"],"answer":"停"},{"question":"哪個形狀有三條邊？","choices":["圓形","正方形","三角形","長方形"],"answer":"三角形"},{"question":"生日蛋糕上會放什麼？","choices":["茄汁","蠟燭","芥末","酸瓜"],"answer":"蠟燭"},{"question":"'熱'的相反是什麼？","choices":["溫暖","冷","辣","晴天"],"answer":"冷"},{"question":"哪種動物身上有條紋？","choices":["獅子","斑馬","猴子","河馬"],"answer":"斑馬"},{"question":"你用什麼來開門？","choices":["鑰匙","香蕉","鞋","帽子"],"answer":"鑰匙"},{"question":"小狗的寶寶叫什麼？","choices":["小貓","小狗","幼獸","幼鹿"],"answer":"小狗"},{"question":"葡萄是什麼顏色的？","choices":["橙色","紫色","粉紅色","啡色"],"answer":"紫色"},{"question":"你什麼時候會用雨傘？","choices":["太陽大的時候","下雨的時候","颳風的時候","下雪的時候"],"answer":"下雨的時候"},{"question":"哪種動物的脖子很長？","choices":["企鵝","長頸鹿","袋鼠","熊"],"answer":"長頸鹿"},{"question":"你會怎樣玩球？","choices":["吃掉它","讀它","扔它","穿上它"],"answer":"扔它"},{"question":"'大'的相反是什麼？","choices":["巨型","小","高","闊"],"answer":"小"},{"question":"下雨後你會看到什麼？","choices":["彩虹","影子","暴風雨","隧道"],"answer":"彩虹"},{"question":"你用什麼來剪紙？","choices":["叉","剪刀","碟子","杯子"],"answer":"剪刀"},{"question":"青蛙怎麼叫？","choices":["嘶嘶","呱呱","吼","唧唧"],"answer":"呱呱"},{"question":"2之後的數字是什麼？","choices":["1","3","4","5"],"answer":"3"},{"question":"你坐在哪裡？","choices":["窗戶上","天花板上","椅子上","牆上"],"answer":"椅子上"},{"question":"哪種動物是叢林之王？","choices":["老虎","獅子","長頸鹿","熊"],"answer":"獅子"},{"question":"紅蘿蔔是什麼顏色的？","choices":["綠色","橙色","紫色","白色"],"answer":"橙色"},{"question":"你用眼睛做什麼？","choices":["聽","聞","看","嚐"],"answer":"看"},{"question":"結冰的水叫什麼？","choices":["蒸氣","冰","果汁","牛奶"],"answer":"冰"},{"question":"以下哪種是水果？","choices":["紅蘿蔔","西蘭花","蘋果","薯仔"],"answer":"蘋果"},{"question":"你用什麼寫字？","choices":["湯匙","叉","鉛筆","刀"],"answer":"鉛筆"},{"question":"你用什麼來打電話？","choices":["電視","電話","雪櫃","床"],"answer":"電話"},{"question":"'開心'的相反是什麼？","choices":["興奮","傷心","生氣","疲倦"],"answer":"傷心"},{"question":"哪種動物在海裡游水，還有魚鰭？","choices":["鳥","魚","蝴蝶","松鼠"],"answer":"魚"},{"question":"你頭上戴什麼？","choices":["襯衫","帽子","褲子","襪子"],"answer":"帽子"}],"measure_words":[{"question":"一（ ）椅子","choices":["張","本","棵","隻"],"answer":"張"},{"question":"一（ ）書","choices":["本","張","棵","隻"],"answer":"本"},{"question":"一（ ）樹","choices":["棵","本","張","隻"],"answer":"棵"},{"question":"一（ ）貓","choices":["隻","張","件","台"],"answer":"隻"},{"question":"一（ ）花","choices":["朵","本","棵","隻"],"answer":"朵"},{"question":"一（ ）筆","choices":["枝","本","棵","張"],"answer":"枝"},{"question":"一（ ）狗","choices":["隻","張","本","匹"],"answer":"隻"},{"question":"一（ ）魚","choices":["條","本","頭","匹"],"answer":"條"},{"question":"一（ ）牛","choices":["頭","扇","條","匹"],"answer":"頭"},{"question":"一（ ）馬","choices":["匹","張","條","頭"],"answer":"匹"},{"question":"一（ ）鳥","choices":["隻","條","頂","頭"],"answer":"隻"},{"question":"一（ ）蜜蜂","choices":["隻","頂","條","座"],"answer":"隻"},{"question":"一（ ）雞","choices":["隻","頂","條","匹"],"answer":"隻"},{"question":"一（ ）鴨","choices":["隻","頂","面","位"],"answer":"隻"},{"question":"一（ ）羊","choices":["隻","頂","把","位"],"answer":"隻"},{"question":"一（ ）豬","choices":["頭","條","位","匹"],"answer":"頭"},{"question":"一（ ）人","choices":["個","枝","朵","張"],"answer":"個"},{"question":"一（ ）老師","choices":["位","頂","本","條"],"answer":"位"},{"question":"一（ ）學生","choices":["個","頂","件","條"],"answer":"個"},{"question":"一（ ）醫生","choices":["位","頂","本","條"],"answer":"位"},{"question":"一（ ）警察","choices":["位","頂","本","條"],"answer":"位"},{"question":"一（ ）大廈","choices":["座","枝","顆","朵"],"answer":"座"},{"question":"一（ ）橋","choices":["座","件","本","棵"],"answer":"座"},{"question":"一（ ）山","choices":["座","枚","道","輪"],"answer":"座"},{"question":"一（ ）河","choices":["條","座","本","輪"],"answer":"條"},{"question":"一（ ）路","choices":["條","座","枝","輪"],"answer":"條"},{"question":"一（ ）車","choices":["輛","本","隻","架"],"answer":"輛"},{"question":"一（ ）飛機","choices":["架","輛","條","部"],"answer":"架"},{"question":"一（ ）電腦","choices":["台","輛","隻","架"],"answer":"台"},{"question":"一（ ）電視","choices":["台","輛","本","架"],"answer":"台"},{"question":"一（ ）手機","choices":["部","枝","棵","架"],"answer":"部"},{"question":"一（ ）蘋果","choices":["個","根","扇","枚"],"answer":"個"},{"question":"一（ ）西瓜","choices":["個","根","枝","枚"],"answer":"個"},{"question":"一（ ）葡萄","choices":["串","張","頂","本"],"answer":"串"},{"question":"一（ ）香蕉","choices":["根","個","張","塊"],"answer":"根"},{"question":"一（ ）草莓","choices":["顆","頂","條","枚"],"answer":"顆"},{"question":"一（ ）鞋子","choices":["雙","件","頂","面"],"answer":"雙"},{"question":"一（ ）襪子","choices":["雙","件","頂","本"],"answer":"雙"},{"question":"一（ ）手套","choices":["雙","件","頂","座"],"answer":"雙"},{"question":"一（ ）筷子","choices":["雙","件","頂","枝"],"answer":"雙"},{"question":"一（ ）眼睛","choices":["雙","件","頂","張"],"answer":"雙"},{"question":"一（ ）門","choices":["扇","張","本","棵"],"answer":"扇"},{"question":"一（ ）窗","choices":["扇","張","本","棵"],"answer":"扇"},{"question":"一（ ）牆","choices":["面","扇","張","棵"],"answer":"面"},{"question":"一（ ）畫","choices":["幅","頂","本","篇"],"answer":"幅"},{"question":"一（ ）照片","choices":["張","頂","本","篇"],"answer":"張"},{"question":"一（ ）詩","choices":["首","張","本","棵"],"answer":"首"},{"question":"一（ ）歌","choices":["首","張","本","棵"],"answer":"首"},{"question":"一（ ）文章","choices":["篇","首","頂","本"],"answer":"篇"},{"question":"一（ ）電影","choices":["部","棵","塊","張"],"answer":"部"},{"question":"一（ ）雨傘","choices":["把","頂","個","張"],"answer":"把"},{"question":"一（ ）信","choices":["封","張","本","個"],"answer":"封"},{"question":"一（ ）眼鏡","choices":["副","隻","個","頂"],"answer":"副"},{"question":"一（ ）帽子","choices":["頂","個","隻","件"],"answer":"頂"},{"question":"一（ ）房間","choices":["間","座","枚","個"],"answer":"間"},{"question":"一（ ）飯","choices":["碗","碟","盤","杯"],"answer":"碗"},{"question":"一（ ）水","choices":["杯","碗","碟","盤"],"answer":"杯"},{"question":"一（ ）蛋糕","choices":["塊","副","張","匹"],"answer":"塊"},{"question":"一（ ）飯桌","choices":["張","台","座","個"],"answer":"張"},{"question":"一（ ）衣服","choices":["件","條","頂","雙"],"answer":"件"},{"question":"一（ ）褲子","choices":["條","本","套","雙"],"answer":"條"},{"question":"一（ ）床","choices":["張","座","間","個"],"answer":"張"},{"question":"一（ ）船","choices":["艘","架","輛","台"],"answer":"艘"},{"question":"一（ ）毛巾","choices":["條","件","枚","張"],"answer":"條"},{"question":"一（ ）牙刷","choices":["枝","根","面","把"],"answer":"枝"},{"question":"一（ ）家庭","choices":["個","把","枝","座"],"answer":"個"},{"question":"一（ ）公司","choices":["間","把","棵","隻"],"answer":"間"},{"question":"一（ ）星星","choices":["顆","張","塊","片"],"answer":"顆"},{"question":"一（ ）白雲","choices":["朵","枝","把","架"],"answer":"朵"},{"question":"一（ ）沙發","choices":["張","個","隻","座"],"answer":"張"},{"question":"一（ ）茶壺","choices":["把","個","枝","杯"],"answer":"把"},{"question":"一（ ）剪刀","choices":["把","張","枝","對"],"answer":"把"},{"question":"一（ ）米","choices":["粒","張","塊","條"],"answer":"粒"},{"question":"一（ ）鹽","choices":["撮","張","枝","點"],"answer":"撮"},{"question":"一（ ）糖","choices":["顆","張","枝","架"],"answer":"顆"},{"question":"一（ ）花生","choices":["顆","隻","條","本"],"answer":"顆"},{"question":"一（ ）西藥","choices":["粒","張","棵","座"],"answer":"粒"},{"question":"一（ ）藥丸","choices":["粒","本","枝","座"],"answer":"粒"},{"question":"一（ ）鈕扣","choices":["粒","張","枝","本"],"answer":"粒"},{"question":"一（ ）子彈","choices":["發","張","枝","本"],"answer":"發"},{"question":"一（ ）種子","choices":["粒","張","隻","本"],"answer":"粒"},{"question":"一（ ）珍珠","choices":["顆","張","本","對"],"answer":"顆"},{"question":"一（ ）鑽石","choices":["顆","本","塊","對"],"answer":"顆"},{"question":"一（ ）心","choices":["顆","個","張","隻"],"answer":"顆"},{"question":"一（ ）淚珠","choices":["滴","張","本","棵"],"answer":"滴"},{"question":"一（ ）露珠","choices":["滴","張","本","棵"],"answer":"滴"},{"question":"一（ ）汗珠","choices":["滴","張","本","棵"],"answer":"滴"},{"question":"一（ ）牙齒","choices":["顆","隻","排","把"],"answer":"顆"},{"question":"一（ ）石頭","choices":["塊","枚","枝","座"],"answer":"塊"},{"question":"一（ ）肥皂","choices":["塊","件","條","個"],"answer":"塊"},{"question":"一（ ）冰塊","choices":["塊","本","隻","片"],"answer":"塊"},{"question":"一（ ）布","choices":["匹","幅","張","枝"],"answer":"匹"},{"question":"一（ ）手錶","choices":["隻","張","本","副"],"answer":"隻"},{"question":"一（ ）手鐲","choices":["隻","對","副","本"],"answer":"隻"},{"question":"一（ ）戒指","choices":["枚","張","顆","本"],"answer":"枚"},{"question":"一（ ）郵票","choices":["枚","張","個","幅"],"answer":"枚"},{"question":"一（ ）火箭","choices":["枚","枝","張","座"],"answer":"枚"},{"question":"一（ ）別針","choices":["枚","枝","根","個"],"answer":"枚"},{"question":"一（ ）蔥","choices":["根","本","棵","隻"],"answer":"根"},{"question":"一（ ）火腿","choices":["根","本","件","片"],"answer":"根"},{"question":"一（ ）油條","choices":["條","張","塊","個"],"answer":"條"},{"question":"一（ ）繩子","choices":["根","本","座","頂"],"answer":"根"},{"question":"一（ ）頭髮","choices":["根","本","撮","絲"],"answer":"根"},{"question":"一（ ）火柴","choices":["根","枝","盒","包"],"answer":"根"},{"question":"一（ ）蠟燭","choices":["根","枝","支","條"],"answer":"根"},{"question":"一（ ）木頭","choices":["根","張","座","堆"],"answer":"根"},{"question":"一（ ）骨頭","choices":["根","張","塊","副"],"answer":"根"},{"question":"一（ ）電線","choices":["根","張","本","座"],"answer":"根"},{"question":"一（ ）竹竿","choices":["根","枝","棵","隻"],"answer":"根"},{"question":"一（ ）旗杆","choices":["根","枝","座","隻"],"answer":"根"},{"question":"一（ ）甘蔗","choices":["根","枝","張","朵"],"answer":"根"},{"question":"一（ ）褲腰帶","choices":["條","本","圍","圈"],"answer":"條"},{"question":"一（ ）小溪","choices":["條","座","本","隻"],"answer":"條"},{"question":"一（ ）圍巾","choices":["條","頂","座","塊"],"answer":"條"},{"question":"一（ ）領帶","choices":["條","頂","根","座"],"answer":"條"},{"question":"一（ ）香腸","choices":["條","張","頂","座"],"answer":"條"},{"question":"一（ ）吐司","choices":["片","張","本","棵"],"answer":"片"},{"question":"一（ ）香煙","choices":["支","本","張","條"],"answer":"支"},{"question":"一（ ）軍艦","choices":["艘","隻","架","座"],"answer":"艘"},{"question":"一（ ）潛艇","choices":["艘","隻","架","台"],"answer":"艘"},{"question":"一（ ）鋼琴","choices":["架","本","座","隻"],"answer":"架"},{"question":"一（ ）機器","choices":["台","本","座","隻"],"answer":"台"},{"question":"一（ ）相機","choices":["部","台","張","個"],"answer":"部"},{"question":"一（ ）樓梯","choices":["道","張","座","本"],"answer":"道"},{"question":"一（ ）閃電","choices":["道","本","棵","隻"],"answer":"道"},{"question":"一（ ）彩虹","choices":["道","本","隻","座"],"answer":"道"},{"question":"一（ ）傷口","choices":["道","張","個","處"],"answer":"道"},{"question":"一（ ）煙","choices":["縷","張","隻","本"],"answer":"縷"},{"question":"一（ ）炊煙","choices":["縷","張","座","道"],"answer":"縷"},{"question":"一（ ）清泉","choices":["股","張","本","棵"],"answer":"股"},{"question":"一（ ）氣流","choices":["股","本","座","隻"],"answer":"股"},{"question":"一（ ）濃煙","choices":["股","張","本","座"],"answer":"股"},{"question":"一（ ）歪風","choices":["股","張","道","本"],"answer":"股"},{"question":"一（ ）力量","choices":["股","張","本","棵"],"answer":"股"},{"question":"一（ ）熱情","choices":["股","張","本","棵"],"answer":"股"},{"question":"一（ ）心意","choices":["份","張","棵","隻"],"answer":"份"},{"question":"一（ ）禮物","choices":["份","張","本","棵"],"answer":"份"},{"question":"一（ ）午餐","choices":["頓","張","本","棵"],"answer":"頓"},{"question":"一（ ）報紙","choices":["份","張","棵","隻"],"answer":"份"},{"question":"一（ ）文件","choices":["份","張","棵","隻"],"answer":"份"},{"question":"一（ ）薪水","choices":["份","張","棵","隻"],"answer":"份"}]}};
+document.addEventListener('DOMContentLoaded', () => {
+    // Global UI Elements
+    const gameModeSwitch = document.getElementById('game-mode-switch');
+    const langSwitch = document.getElementById('lang-switch');
+    const addSettingsBtn = document.getElementById('add-settings-btn');
+    const addSettingsModal = document.getElementById('add-settings-modal');
+    const settingsSaveBtn = document.getElementById('settings-save-btn');
+    const settingsCloseBtn = document.getElementById('settings-close-btn');
+    const mDigitsInput = document.getElementById('m-digits-input');
+    const nDigitsInput = document.getElementById('n-digits-input');
+    const labelMDigits = document.getElementById('label-m-digits');
+    const labelNDigits = document.getElementById('label-n-digits');
+    const settingsTitle = document.getElementById('settings-title');
+    
+    // Multiple Choice UI Elements
+    const mcGameContainer = document.getElementById('mc-game-container');
+    const categorySwitch = document.getElementById('category-switch');
+    const skipBtn = document.getElementById('skip-btn');
+    const question = document.getElementById('question');
+    const choicesContainer = document.getElementById('choices-container');
+
+    // Sentence Order UI Elements
+    const soGameContainer = document.getElementById('so-game-container');
+    const scrambledContainer = document.getElementById('scrambled-sentence');
+    const answerContainer = document.getElementById('answer-container');
+    const retryButton = document.getElementById('retry-button');
+    const soSkipButton = document.getElementById('so-skip-button');
+    const feedback = document.getElementById('feedback');
+
+    const addGameContainer = document.getElementById('add-game-container');
+    const addRetryButton = document.getElementById('add-retry-button');
+    const addSkipButton = document.getElementById('add-skip-button');
+    const addRowTop = document.getElementById('add-row-top');
+    const addRowBottomDigits = document.getElementById('add-row-bottom-digits');
+    const addRowAnswer = document.getElementById('add-row-answer');
+    const addFeedback = document.getElementById('add-feedback');
+    const addSubmitBtn = document.getElementById('add-submit-btn');
+
+    const subGameContainer = document.getElementById('sub-game-container');
+    const subRetryButton = document.getElementById('sub-retry-button');
+    const subSkipButton = document.getElementById('sub-skip-button');
+    const subRowTop = document.getElementById('sub-row-top');
+    const subRowBottomDigits = document.getElementById('sub-row-bottom-digits');
+    const subRowAnswer = document.getElementById('sub-row-answer');
+    const subFeedback = document.getElementById('sub-feedback');
+    const subSubmitBtn = document.getElementById('sub-submit-btn');
+
+    const saGameContainer = document.getElementById('sa-game-container');
+    const saRetryButton = document.getElementById('sa-retry-button');
+    const saSkipButton = document.getElementById('sa-skip-button');
+    const saQuestion = document.getElementById('sa-question');
+    const saAnswerInput = document.getElementById('sa-answer-input');
+    const saFeedback = document.getElementById('sa-feedback');
+    const saSubmitBtn = document.getElementById('sa-submit-btn');
+
+    // State Variables
+    let currentLanguage = 'zh';
+    let currentCategory = 'measure_words';
+    let currentGameMode = 'multiple_choice';
+    let mcQuestions = [];
+    let currentMcQuestionIndex = 0;
+    
+    let soCurrentSentenceIndex = 0;
+    let soDraggedItem = null;
+    let soAnswerPlaceholder = null;
+    let soTouchStartX = 0;
+    let soTouchStartY = 0;
+
+    let addMDigits = 3;
+    let addNDigits = 3;
+    let addCurrentTop = 0;
+    let addCurrentBottom = 0;
+    let addCorrectAnswer = 0;
+    let addIsIncorrect = false;
+
+    let subMDigits = 3;
+    let subNDigits = 3;
+    let subCurrentTop = 0;
+    let subCurrentBottom = 0;
+    let subCorrectAnswer = 0;
+    let subIsIncorrect = false;
+
+    let saCurrentQuestionIndex = 0;
+    let saCorrectAnswer = 0;
+    let saIsIncorrect = false;
+
+    const soSentences = [
+        { scrambled: '我的/中文/名字/叫做/陳大文。', correct: '我的中文名字叫做陳大文。' },
+        { scrambled: '我/很喜歡/去/公園/玩耍。', correct: '我很喜歡去公園玩耍。' },
+        { scrambled: '這顆/紅色的/蘋果/很/好吃。', correct: '這顆紅色的蘋果很好吃。' },
+        { scrambled: '我們/家裡/有/三隻/小貓。', correct: '我們家裡有三隻小貓。' },
+        { scrambled: '金色的/太陽/掛在/藍藍的/天上。', correct: '金色的太陽掛在藍藍的天上。' },
+        { scrambled: '今天/的/天氣/真的/很/好。', correct: '今天的天氣真的很好。' },
+        { scrambled: '我/很/想吃/美味的/冰淇淋。', correct: '我很想吃美味的冰淇淋。' },
+        { scrambled: '我的/媽媽/是/一位/好/老師。', correct: '我的媽媽是一位好老師。' },
+        { scrambled: '我的/書包裡/有/一本/故事書。', correct: '我的書包裡有一本故事書。' },
+        { scrambled: '我/和/好朋友/一起/上學。', correct: '我和好朋友一起上學。' },
+        { scrambled: '媽媽/在/廚房/裡面/做飯。', correct: '媽媽在廚房裡面做飯。' },
+        { scrambled: '美術/老師/正在/教/我們/畫畫。', correct: '美術老師正在教我們畫畫。' },
+        { scrambled: '那隻/小貓/喜歡/玩/毛線球。', correct: '那隻小貓喜歡玩毛線球。' },
+        { scrambled: '公園/裡面/有/很多/美麗的/花。', correct: '公園裡面有很多美麗的花。' },
+        { scrambled: '桌子/上面/放著/一本/故事書。', correct: '桌子上面放著一本故事書。' },
+        { scrambled: '夏天/天氣/炎熱，/我/很喜歡/游泳。', correct: '夏天天氣炎熱，我很喜歡游泳。' },
+        { scrambled: '秋天/的時候，/葉子/都/變黃了。', correct: '秋天的時候，葉子都變黃了。' },
+        { scrambled: '北方的/冬天/天氣/非常/寒冷。', correct: '北方的冬天天氣非常寒冷。' },
+        { scrambled: '我的/弟弟/很/喜歡/吃/巧克力。', correct: '我的弟弟很喜歡吃巧克力。' },
+        { scrambled: '小妹妹/的/頭髮/又黑/又長。', correct: '小妹妹的頭髮又黑又長。' },
+        { scrambled: '爺爺/喜歡/在/公園/散步。', correct: '爺爺喜歡在公園散步。' },
+        { scrambled: '我奶奶/做的/飯菜/很/好吃。', correct: '我奶奶做的飯菜很好吃。' },
+        { scrambled: '小狗/在/門口/等待/它的/主人。', correct: '小狗在門口等待它的主人。' },
+        { scrambled: '魚兒/在/水里/游來/游去。', correct: '魚兒在水里游來游去。' },
+        { scrambled: '一架/飛機/在/藍天上/飛。', correct: '一架飛機在藍天上飛。' },
+        { scrambled: '火車/在/長長的/軌道上/跑。', correct: '火車在長長的軌道上跑。' },
+        { scrambled: '一艘/輪船/在/大海上/航行。', correct: '一艘輪船在大海上航行。' },
+        { scrambled: '警察/叔叔/在/路口/指揮/交通。', correct: '警察叔叔在路口指揮交通。' },
+        { scrambled: '消防員/叔叔/滅火時/很/勇敢。', correct: '消防員叔叔滅火時很勇敢。' },
+        { scrambled: '醫生/阿姨/給/病人/看病。', correct: '醫生阿姨給病人看病。' },
+        { scrambled: '醫院的/護士/姐姐/非常/溫柔。', correct: '醫院的護士姐姐非常溫柔。' },
+        { scrambled: '農夫/伯伯/在/田裡/種地。', correct: '農夫伯伯在田裡種地。' },
+        { scrambled: '工人/叔叔/在/蓋/新/房子。', correct: '工人叔叔在蓋新房子。' },
+        { scrambled: '我/學會了/用/電腦/畫/圖畫。', correct: '我學會了用電腦畫圖畫。' },
+        { scrambled: '我/平時/最/喜歡/聽/兒歌。', correct: '我平時最喜歡聽兒歌。' },
+        { scrambled: '我/會/自己/動手/整理/房間。', correct: '我會自己動手整理房間。' },
+        { scrambled: '我/很/喜歡/主動/幫助/別人。', correct: '我很喜歡主動幫助別人。' },
+        { scrambled: '我們/大家/都/要/愛護/環境。', correct: '我們大家都要愛護環境。' },
+        { scrambled: '我們/不/可以/隨地/亂扔/垃圾。', correct: '我們不可以隨地亂扔垃圾。' },
+        { scrambled: '過/馬路/的/時候/要/看/交通燈。', correct: '過馬路的時候要看交通燈。' },
+        { scrambled: '吃飯/前，/我們/必須/洗手。', correct: '吃飯前，我們必須洗手。' },
+        { scrambled: '只要/早睡/早起，/身體/就/會好。', correct: '只要早睡早起，身體就會好。' },
+        { scrambled: '我/會/主動/對/別人/說/謝謝。', correct: '我會主動對別人說謝謝。' },
+        { scrambled: '做/錯了/事情/就要/說/對不起。', correct: '做錯了事情就要說對不起。' },
+        { scrambled: '爸爸媽媽/都/說/我是/好/孩子。', correct: '爸爸媽媽都說我是好孩子。' },
+        { scrambled: '這個/世界/上/有/很多/國家。', correct: '這個世界上有很多國家。' },
+        { scrambled: '天上的/白雲/像/一群/小白羊。', correct: '天上的白雲像一群小白羊。' },
+        { scrambled: '妹妹/在/桌子上/畫了/一朵/紅花。', correct: '妹妹在桌子上畫了一朵紅花。' }
+    ];
+
+    const saQuestions = [
+        { question: '小明有15個蘋果，小明比小華多4個。小華有多少個蘋果？', answer: 11 },
+        { question: '小華有12個氣球，小華比小明少3個。小明有多少個氣球？', answer: 15 },
+        { question: '小花身高16厘米，小花比小明高5厘米。小明身高多少厘米？', answer: 11 },
+        { question: '弟弟有9顆糖果，弟弟比媽媽少6顆。媽媽有多少顆糖果？', answer: 15 },
+        { question: '故事書有14本，故事書比童話書少7本。童話書有多少本？', answer: 21 },
+        { question: '阿明有11張郵票，阿明比阿強少5張。阿強有多少張郵票？', answer: 16 },
+        { question: '小美有13枝鉛筆，小美比小華多8枝。小華有多少枝鉛筆？', answer: 5 },
+        { question: '小君跳了10下，小君比東東少6下。東東跳了多少下？', answer: 16 },
+        { question: '男生有12人，男生比女生少4人。女生有多少人？', answer: 16 },
+        { question: '這條魚重18克，這條魚比那條魚輕5克。那條魚重多少克？', answer: 23 },
+        { question: '小明今年9歲，小明比小華大3歲。小華今年幾歲？', answer: 6 },
+        { question: '另一袋米重12公斤，另一袋比這袋輕7公斤。這袋米重多少公斤？', answer: 19 },
+        { question: '兒子身高13厘米，兒子比爸爸矮4厘米。爸爸身高多少厘米？', answer: 17 },
+        { question: '椅子有15張，椅子比桌子少6張。桌子有多少張？', answer: 21 },
+        { question: '小美有14個貼紙，小美比小芳少5個。小芳有多少個貼紙？', answer: 19 },
+        { question: '第一排有11人，第一排比第二排少4人。第二排有多少人？', answer: 15 },
+        { question: '昨天賣出13個蛋糕，昨天比今天少8個。今天賣出多少個蛋糕？', answer: 21 },
+        { question: '小貓重11公斤，小貓比小狗輕3公斤。小狗重多少公斤？', answer: 14 },
+        { question: '漫畫書有10本，漫畫書比故事書少9本。故事書有多少本？', answer: 19 },
+        { question: '小明跑了15米，小明比小強少6米。小強跑了多少米？', answer: 21 },
+        { question: '小華有18個蘋果，小華比小明少7個。小明有多少個蘋果？', answer: 25 },
+        { question: '紅隊有16個氣球，紅隊比藍隊多5個。藍隊有多少個氣球？', answer: 11 },
+        { question: '小明身高14厘米，小明比小花矮4厘米。小花身高多少厘米？', answer: 18 },
+        { question: '媽媽有17顆糖果，媽媽比弟弟多8顆。弟弟有多少顆糖果？', answer: 9 },
+        { question: '童話書有15本，童話書比故事書多6本。故事書有多少本？', answer: 9 },
+        { question: '阿強有19張郵票，阿強比阿明多9張。阿明有多少張郵票？', answer: 10 },
+        { question: '小華有12枝鉛筆，小華比小美少5枝。小美有多少枝鉛筆？', answer: 17 },
+        { question: '東東跳了17下，東東比小君多8下。小君跳了多少下？', answer: 9 },
+        { question: '女生有13人，女生比男生多7人。男生有多少人？', answer: 6 },
+        { question: '這條魚重16克，這條魚比那條魚重8克。那條魚重多少克？', answer: 8 },
+        { question: '秋天到了，小明在果園裡摘了15個紅蘋果，他發現自己比小華多摘了4個。請問小華摘了幾個蘋果呢？', answer: 11 },
+        { question: '派對上，小華拿到了12個彩色氣球。如果他手上的氣球比小明少3個，那小明總共有幾個氣球？', answer: 15 },
+        { question: '在積木城堡裡，小花堆的塔高16厘米，剛好比小明堆的塔高出5厘米。小明堆的塔有多高？', answer: 11 },
+        { question: '弟弟口袋裡裝了9顆水果糖，但他擁有的糖果比媽媽少了6顆。你知道媽媽有幾顆糖果嗎？', answer: 15 },
+        { question: '圖書館的書架上擺了14本冒險故事書，這些故事書的數量比童話書少了7本。請問童話書共有幾本？', answer: 21 },
+        { question: '阿明收集了11張珍貴的動物郵票，不過他的收藏比阿強少了5張。阿強的集郵冊裡有幾張郵票？', answer: 16 },
+        { question: '開學了，小美的鉛筆盒裡裝了13枝新鉛筆，比小華的鉛筆多出了8枝。小華帶了幾枝鉛筆來學校？', answer: 5 },
+        { question: '體育課跳繩比賽，小君連續跳了10下，但她比東東少跳了6下。東東這次總共跳了幾下呢？', answer: 16 },
+        { question: '合唱團裡有12位男生參與排練，男生的人數比女生少了4人。請問合唱團裡有幾位女生？', answer: 16 },
+        { question: '水族箱裡的一條小金魚重18克，牠比旁邊的黑魚輕了5克。那條黑魚的重量是多少克？', answer: 23 },
+        { question: '剛過完生日的小明今年9歲了，他剛好比鄰居小華大3歲。請問小華今年幾歲？', answer: 6 },
+        { question: '超市裡有一袋重12公斤的糙米，這袋糙米比旁邊的白米輕了7公斤。那袋白米有多重？', answer: 19 },
+        { question: '桌上的小機器人兒子模型高13厘米，它比機器人爸爸模型矮了4厘米。機器人爸爸模型有多高？', answer: 17 },
+        { question: '教室裡目前排了15張椅子，椅子的數量比桌子少了6張。請問教室裡總共有幾張桌子？', answer: 21 },
+        { question: '小美的手帳本裡收集了14張可愛的星星貼紙，但她比小芳少了5張。小芳總共有幾張貼紙？', answer: 19 },
+        { question: '看電影時，坐在第一排的觀眾有11人，比第二排的觀眾少了4人。第二排坐了多少人？', answer: 15 },
+        { question: '麵包店昨天賣出了13個草莓蛋糕，昨天的銷量比今天少了8個。今天一共賣出幾個草莓蛋糕？', answer: 21 },
+        { question: '寵物醫院裡，一隻胖胖的小貓體重是11公斤，牠比旁邊的小狗輕了3公斤。小狗的體重是多少？', answer: 14 },
+        { question: '書桌上疊了10本熱門的漫畫書，漫畫書的數量比故事書少了9本。請問故事書有幾本？', answer: 19 },
+        { question: '操場上，小明奮力往前跑了15米，但他跑的距離比小強少了6米。小強總共跑了多遠？', answer: 21 },
+        { question: '野餐時，小華的籃子裡裝了18個蘋果，他的蘋果比小明少了7個。小明帶了幾個蘋果來？', answer: 25 },
+        { question: '運動會的佈置上，紅隊準備了16個氣球，比藍隊準備的氣球多出5個。藍隊準備了幾個氣球？', answer: 11 },
+        { question: '自然課觀察植物，小明種的向日葵幼苗高14厘米，比小花種的矮了4厘米。小花的向日葵有多高？', answer: 18 },
+        { question: '過年時，媽媽抓了17顆巧克力糖在手裡，她拿的糖果比弟弟多了8顆。弟弟拿到了幾顆糖果？', answer: 9 },
+        { question: '班級的圖書角裡有15本安徒生童話，童話書的數量比歷史故事書多了6本。歷史故事書有幾本？', answer: 9 },
+        { question: '阿強的集郵冊裡珍藏了19張外國郵票，他的郵票比阿明多出了9張。阿明收集了幾張郵票？', answer: 10 },
+        { question: '畫畫課上，小華帶了12枝彩色鉛筆，他的鉛筆比小美少了5枝。小美帶了幾枝彩色鉛筆？', answer: 17 },
+        { question: '在跳格子遊戲中，東東一口氣跳了17下，他比小君多跳了8下。請問小君跳了幾下？', answer: 9 },
+        { question: '舞蹈班裡有13位女生正在練習，女生的人數比男生多了7人。舞蹈班裡有幾位男生？', answer: 6 },
+        { question: '釣魚比賽中，哥哥釣到一條重16克的小魚，這條魚比弟弟釣到的重了8克。弟弟釣的魚有多重？', answer: 8 },
+        { question: '果園裡，小明摘了12個香甜的橙子。他發現自己比小強多摘了5個。請問小強摘了幾個橙子呢？', answer: 7 },
+        { question: '小麗的糖果比小美的多7粒。如果小美只有8粒糖果，那麼小麗總共有幾粒？', answer: 15 },
+        { question: '睡前閱讀時間，哥哥挑選了14本他最愛的故事書，比弟弟多拿了6本。弟弟選了幾本故事書？', answer: 8 },
+        { question: '文具店裡，姐姐買了9張動物貼紙，她買的貼紙比妹妹少了8張。妹妹一共買了幾張貼紙？', answer: 17 },
+        { question: '考試前，小華準備了15枝備用鉛筆，他的鉛筆數量比小明多出了7枝。小明準備了幾枝鉛筆？', answer: 8 },
+        { question: '小強的玩具箱裡有6台酷炫的玩具車，但他的玩具車比小明少了9台。小明擁有幾台玩具車？', answer: 15 },
+        { question: '獎勵時間到了，老師手上有18張好寶寶紅星貼紙，比班長手上的多出9張。班長有幾張紅星貼紙？', answer: 9 },
+        { question: '點心時間，小貓分到了7個肉泥罐頭，牠的罐頭比小狗的零食少了5個。小狗分到幾個零食？', answer: 12 },
+        { question: '體育室裡，小明整理出13個彩色皮球，他整理的數量比小華多4個。小華整理了幾個皮球？', answer: 9 },
+        { question: '小美的床頭擺了11個可愛的毛絨玩偶，她的玩偶比小麗少了6個。小麗的房間裡有幾個玩偶？', answer: 17 },
+        { question: '在搭建城堡時，弟弟用了10塊彩色積木，他用的積木比哥哥多了3塊。哥哥用了幾塊積木？', answer: 7 },
+        { question: '花園裡，妹妹採了5朵美麗的雛菊，她採的花比姐姐少了12朵。姐姐一共採了幾朵花？', answer: 17 },
+        { question: '去海邊玩時，小傑撿到了16個漂亮的貝殼，他撿的貝殼比小玲多8個。小玲撿了幾個貝殼？', answer: 8 },
+        { question: '遊樂園裡，小麗手裡拿著4個造型氣球，她的氣球比小美少了11個。小美買了幾個氣球？', answer: 15 },
+        { question: '哥哥的收集冊裡蓋了12個不同的風景印章，他的印章比弟弟多了7個。弟弟收集了幾個印章？', answer: 5 },
+        { question: '梳妝台上，姐姐放了8個閃亮的髮夾，她的髮夾比妹妹少了9個。妹妹擁有幾個髮夾？', answer: 17 },
+        { question: '農場採果樂，小明摘了14個大蘋果，他摘的數量比小強多了9個。小強摘了幾個蘋果？', answer: 5 },
+        { question: '萬聖節討糖果，小美拿到了7粒巧克力，她得到的巧克力比小麗少了8粒。小麗拿到了幾粒巧克力？', answer: 15 },
+        { question: '書架上，弟弟專屬的畫冊有11本，他的畫冊比哥哥多了6本。哥哥有幾本畫冊？', answer: 5 },
+        { question: '妹妹親手做了6個精美的書籤，她做的書籤比姐姐少了13個。姐姐一共做了幾個書籤？', answer: 19 },
+        { question: '下課時玩彈珠遊戲，小青贏得了15個玻璃彈珠，她比小芳多贏了7個。小芳有幾個彈珠？', answer: 8 },
+        { question: '撲滿裡，小麗存了9個十元硬幣，她的硬幣比小美少了6個。小美存了幾個硬幣？', answer: 15 },
+        { question: '黑板前，老師的粉筆盒裡有17枝彩色粉筆，比值日生手上的粉筆多出8枝。值日生拿了幾枝粉筆？', answer: 9 },
+        { question: '寵物店裡，小貓的項圈上掛了5個小鈴鐺，牠的鈴鐺比小狗少了12個。小狗的項圈上有幾個鈴鐺？', answer: 17 },
+        { question: '水果攤上，小明買了12個多汁的梨子，他買的梨子比小華多了4個。小華買了幾個梨子？', answer: 8 },
+        { question: '手工藝課上，小美編織了8個彩色手環，她編的手環比小麗少了11個。小麗編了幾個手環？', answer: 19 },
+        { question: '玩具大賽中，弟弟帶來了13個戰鬥陀螺，他的陀螺比哥哥多了5個。哥哥帶了幾個陀螺？', answer: 8 },
+        { question: '體育器材室裡，妹妹找到了7個塑膠哨子，她找到的哨子比姐姐少了9個。姐姐找到了幾個哨子？', answer: 16 },
+        { question: '春遊時，小傑用紙摺了14個彩色風車，他摺的風車比小玲多了6個。小玲摺了幾個風車？', answer: 8 },
+        { question: '體育課發放器材，小麗拿到了10個羽毛毽子，她拿到的毽子比小美少了8個。小美拿到了幾個毽子？', answer: 18 },
+        { question: '星際探險家在火星上發現了15顆發光的能量石，但在返回飛船時不小心掉進隕石坑裡4顆。他現在還剩下幾顆能量石？', answer: 11 },
+        { question: '深海尋寶潛水艇下潛到了16米深的珊瑚礁，這剛好比美人魚的秘密花園深了5米。請問美人魚的秘密花園在水下幾米處？', answer: 11 },
+        { question: '時光旅行者在侏羅紀拍了9張恐龍的照片，但他拍的照片數量比他的機器人助手少了6張。機器人助手拍了幾張照片？', answer: 15 },
+        { question: '宇宙海盜在小行星帶收集了11塊星辰碎片，不過他的收藏比星際警察少了5塊。星際警察的保險箱裡有幾塊星辰碎片？', answer: 16 },
+        { question: '精靈烘焙坊今天烤出了13個會唱歌的魔法杯子蛋糕，比昨天多烤了8個。昨天烘焙坊烤了幾個魔法杯子蛋糕？', answer: 5 },
+        { question: '在雲端賽車比賽中，閃電號連續超越了10朵雷雨雲，但它比疾風號少超越了6朵。疾風號這次總共超越了幾朵雷雨雲？', answer: 16 },
+        { question: '剛從沉睡中甦醒的小火龍今年9歲了，牠剛好比隔壁洞穴的冰霜幼龍大3歲。請問冰霜幼龍今年幾歲？', answer: 6 },
+        { question: '飛船的貨艙裡有一箱重12公斤的月球岩石，這箱岩石比旁邊的火星土壤輕了7公斤。那箱火星土壤有多重？', answer: 19 },
+        { question: '小魔女的飛行掃帚上掛了14個防風鈴鐺，但她比大魔女少了5個。大魔女的掃帚上總共有幾個鈴鐺？', answer: 19 },
+        { question: '觀賞銀河流星雨時，坐在觀星台左邊的幽靈有11位，比右邊的幽靈少了4位。右邊坐了多少位幽靈？', answer: 15 },
+        { question: '夢境工廠昨天製造了11個甜美的夢境氣泡，昨天的產量比今天少了8個。今天一共製造了幾個夢境氣泡？', answer: 19 },
+        { question: '怪獸收容所裡，一隻毛茸茸的雪怪體重是11公斤，牠比旁邊的岩石怪輕了3公斤。岩石怪的體重是多少？', answer: 14 },
+        { question: '在無重力訓練室裡，太空人小明奮力往前飄了12米，但他飄的距離比小強少了6米。小強總共飄了多遠？', answer: 18 },
+        { question: '銀河運動會的佈置上，彗星隊準備了16個星雲氣球，比流星隊準備的氣球多出5個。流星隊準備了幾個星雲氣球？', answer: 11 },
+        { question: '外星植物觀察課，小明種的觸手草幼苗高14厘米，比小花種的矮了4厘米。小花的觸手草有多高？', answer: 18 },
+        { question: '太空站的圖書角裡有15本銀河系漫遊指南，指南的數量比黑洞探險手冊多了6本。黑洞探險手冊有幾本？', answer: 9 },
+        { question: '全息投影畫畫課上，小華帶了12枝光劍畫筆，他的畫筆比小美少了5枝。小美帶了幾枝光劍畫筆？', answer: 17 },
+        { question: '精靈舞蹈班裡有13位水精靈正在練習，水精靈的人數比火精靈多了7人。舞蹈班裡有幾位火精靈？', answer: 6 },
+        { question: '星際釣魚比賽中，哥哥釣到一條重16克的太空水母，這隻水母比弟弟釣到的重了8克。弟弟釣的太空水母有多重？', answer: 8 }
+    ];
+
+    const categoryTranslations = {
+        'measure_words': { zh: '量詞', en: 'Measure Words' },
+        'general_knowledge': { zh: '常識', en: 'General Knowledge' }
+    };
+
+    const gameModeTranslations = {
+        'multiple_choice': { zh: '選擇題', en: 'Multiple Choice' },
+        'sentence_order': { zh: '句子排序', en: 'Sentence Order' },
+        'addition': { zh: '加法', en: 'Addition' },
+        'subtraction': { zh: '減法', en: 'Subtraction' },
+        'short_answer': { zh: '文字題', en: 'Short Answer' }
+    };
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function updateTitle(lang) {
+        if (currentGameMode === 'multiple_choice') {
+            document.title = lang === 'zh' ? '選擇題練習' : 'Multiple Choice Game';
+        } else if (currentGameMode === 'sentence_order') {
+            document.title = lang === 'zh' ? '中文句子排序遊戲' : 'Sentence Order Game';
+        } else if (currentGameMode === 'addition') {
+            document.title = lang === 'zh' ? '加法練習' : 'Addition Game';
+        } else if (currentGameMode === 'subtraction') {
+            document.title = lang === 'zh' ? '減法練習' : 'Subtraction Game';
+        } else if (currentGameMode === 'short_answer') {
+            document.title = lang === 'zh' ? '文字題練習' : 'Short Answer Game';
+        }
+    }
+
+    function updateCategoryOptions(lang) {
+        for (const option of categorySwitch.options) {
+            const key = option.value;
+            if (categoryTranslations[key]) {
+                option.textContent = categoryTranslations[key][lang];
+            }
+        }
+    }
+
+    function updateUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('lang', currentLanguage);
+        urlParams.set('mode', currentGameMode);
+        
+        if (currentGameMode === 'multiple_choice') {
+            urlParams.set('category', currentCategory);
+            urlParams.delete('m');
+            urlParams.delete('n');
+        } else if (currentGameMode === 'addition') {
+            urlParams.delete('category');
+            urlParams.set('m', addMDigits);
+            urlParams.set('n', addNDigits);
+        } else if (currentGameMode === 'subtraction') {
+            urlParams.delete('category');
+            urlParams.set('m', subMDigits);
+            urlParams.set('n', subNDigits);
+        } else {
+            urlParams.delete('category');
+            urlParams.delete('m');
+            urlParams.delete('n');
+        }
+
+        const newUrl = window.location.pathname + '?' + urlParams.toString();
+        window.history.replaceState({}, '', newUrl);
+    }
+
+    function updateGameModeOptions(lang) {
+        for (const option of gameModeSwitch.options) {
+            const key = option.value;
+            if (gameModeTranslations[key]) {
+                option.textContent = gameModeTranslations[key][lang];
+            }
+        }
+    }
+
+    async function loadMcQuestions(lang, category) {
+        if (typeof questionsData !== 'undefined') {
+            mcQuestions = questionsData[lang][category];
+        } else {
+            const response = await fetch(`/questions/${lang}/${category}.json`);
+            mcQuestions = await response.json();
+        }
+        shuffleArray(mcQuestions);
+    }
+
+    function renderMcQuestion() {
+        if (!mcQuestions || mcQuestions.length === 0) {
+            question.textContent = 'No questions found.';
+            choicesContainer.innerHTML = '';
+            return;
+        }
+        const currentQuestion = mcQuestions[currentMcQuestionIndex];
+        question.textContent = currentQuestion.question;
+        choicesContainer.innerHTML = '';
+
+        const choices = [...currentQuestion.choices];
+        shuffleArray(choices);
+
+        choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.textContent = choice;
+            button.classList.add('choice');
+            button.addEventListener('click', () => checkMcAnswer(choice, button));
+            choicesContainer.appendChild(button);
+        });
+    }
+
+    function checkMcAnswer(selectedChoice, button) {
+        const currentQuestion = mcQuestions[currentMcQuestionIndex];
+        const choiceButtons = choicesContainer.querySelectorAll('.choice');
+
+        choiceButtons.forEach(btn => btn.disabled = true);
+
+        if (selectedChoice === currentQuestion.answer) {
+            button.classList.add('correct');
+            setTimeout(() => {
+                currentMcQuestionIndex = (currentMcQuestionIndex + 1) % mcQuestions.length;
+                renderMcQuestion();
+            }, 2500);
+        } else {
+            button.classList.add('wrong');
+            setTimeout(() => {
+                choiceButtons.forEach(btn => {
+                    if (!btn.classList.contains('wrong')) {
+                        btn.disabled = false;
+                    }
+                });
+            }, 500);
+        }
+    }
+
+    // Sentence Order Game Functions
+    function soLoadSentence() {
+        scrambledContainer.innerHTML = '';
+        answerContainer.innerHTML = '';
+        feedback.textContent = '';
+        
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * soSentences.length);
+        } while (randomIndex === soCurrentSentenceIndex);
+        soCurrentSentenceIndex = randomIndex;
+
+        const sentence = soSentences[soCurrentSentenceIndex];
+        const words = sentence.scrambled.split('/');
+        words.sort(() => Math.random() - 0.5); // Further shuffle
+        words.forEach(word => {
+            const wordBlock = document.createElement('div');
+            wordBlock.textContent = word;
+            wordBlock.className = 'word-block';
+            wordBlock.draggable = true;
+            scrambledContainer.appendChild(wordBlock);
+        });
+        soAddWordBlockListeners();
+        scrambledContainer.style.height = 'auto';
+        const height = scrambledContainer.offsetHeight;
+        scrambledContainer.style.height = height + 'px';
+        answerContainer.style.height = height + 'px';
+    }
+
+    function soAddWordBlockListeners() {
+        const wordBlocks = document.querySelectorAll('.word-block');
+        wordBlocks.forEach(item => {
+            item.addEventListener('dragstart', soHandleDragStart, false);
+            item.addEventListener('touchstart', soHandleTouchStart, {passive: false});
+        });
+    }
+
+    function soHandleTap() {
+        if (this.parentElement === scrambledContainer) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'word-block placeholder';
+            placeholder.style.width = this.offsetWidth + 'px';
+            placeholder.style.height = this.offsetHeight + 'px';
+            placeholder.dataset.word = this.textContent;
+            this.parentElement.replaceChild(placeholder, this);
+            answerContainer.appendChild(this);
+        } else {
+            const originalPlaceholder = Array.from(scrambledContainer.children).find(child => child.dataset.word === this.textContent);
+            if (originalPlaceholder) {
+                scrambledContainer.replaceChild(this, originalPlaceholder);
+            }
+        }
+        soCheckAnswer();
+    }
+
+    function soHandleTouchStart(e) {
+      if (!e.target.classList.contains('word-block') || e.target.classList.contains('placeholder')) return;
+      
+      soDraggedItem = e.target;
+      const touch = e.touches[0];
+      soTouchStartX = touch.clientX;
+      soTouchStartY = touch.clientY;
+      
+      document.addEventListener('touchmove', soHandleTouchMove, {passive: false});
+      document.addEventListener('touchend', soHandleTouchEnd, {passive: false});
+    }
+
+    function soHandleTouchMove(e) {
+      if (!soDraggedItem) return;
+      
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - soTouchStartX);
+      const deltaY = Math.abs(touch.clientY - soTouchStartY);
+      
+      if (deltaX > 5 || deltaY > 5) {
+        if (e.cancelable) e.preventDefault(); 
+        
+        const width = soDraggedItem.offsetWidth;
+        const height = soDraggedItem.offsetHeight;
+
+        if (soDraggedItem.style.position !== 'fixed') {
+            if (soDraggedItem.parentElement === scrambledContainer) {
+                 const placeholder = document.createElement('div');
+                 placeholder.className = 'word-block placeholder';
+                 placeholder.style.width = width + 'px';
+                 placeholder.style.height = height + 'px';
+                 placeholder.dataset.word = soDraggedItem.textContent;
+                 scrambledContainer.replaceChild(placeholder, soDraggedItem);
+                 document.body.appendChild(soDraggedItem);
+            }
+
+            soDraggedItem.style.width = width + 'px';
+            soDraggedItem.style.height = height + 'px';
+            soDraggedItem.style.position = 'fixed';
+            soDraggedItem.style.zIndex = '1000';
+            soDraggedItem.style.pointerEvents = 'none';
+            soDraggedItem.style.opacity = '0.8';
+        }
+        
+        soDraggedItem.style.left = touch.clientX - (soDraggedItem.offsetWidth / 2) + 'px';
+        soDraggedItem.style.top = touch.clientY - (soDraggedItem.offsetHeight / 2) + 'px';
+
+        const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+        let targetContainer = null;
+        if (dropTarget) {
+            if (dropTarget.classList.contains('dropzone')) {
+                targetContainer = dropTarget;
+            } else {
+                const dropzone = dropTarget.closest('.dropzone');
+                if (dropzone) targetContainer = dropzone;
+            }
+        }
+
+        if (targetContainer === answerContainer) {
+            if (!soAnswerPlaceholder) {
+                soAnswerPlaceholder = document.createElement('div');
+                soAnswerPlaceholder.className = 'word-block placeholder';
+                soAnswerPlaceholder.style.width = width + 'px';
+                soAnswerPlaceholder.style.height = height + 'px';
+            }
+            const afterElement = soGetDragAfterElement(answerContainer, touch.clientX, touch.clientY);
+            if (afterElement) {
+                answerContainer.insertBefore(soAnswerPlaceholder, afterElement);
+            } else {
+                answerContainer.appendChild(soAnswerPlaceholder);
+            }
+        } else if (soAnswerPlaceholder) {
+            soAnswerPlaceholder.remove();
+            soAnswerPlaceholder = null;
+        }
+      }
+    }
+
+    function soHandleTouchEnd(e) {
+      if (!soDraggedItem) return;
+
+      const touch = e.changedTouches[0];
+      const touchEndX = touch.clientX;
+      const touchEndY = touch.clientY;
+
+      const deltaX = Math.abs(touchEndX - soTouchStartX);
+      const deltaY = Math.abs(touchEndY - soTouchStartY);
+
+      if (deltaX <= 5 && deltaY <= 5) {
+        soHandleTap.call(soDraggedItem);
+      } else if (soDraggedItem.style.position === 'fixed') {
+        const dropTarget = document.elementFromPoint(touchEndX, touchEndY);
+        let targetContainer = null;
+        
+        if (dropTarget) {
+            if (dropTarget.classList.contains('dropzone')) {
+                targetContainer = dropTarget;
+            } else {
+                const dropzone = dropTarget.closest('.dropzone');
+                if (dropzone) targetContainer = dropzone;
+            }
+        }
+
+        if (targetContainer === answerContainer) {
+            const afterElement = soGetDragAfterElement(answerContainer, touchEndX, touchEndY);
+            
+            if (afterElement) {
+                answerContainer.insertBefore(soDraggedItem, afterElement);
+            } else {
+                answerContainer.appendChild(soDraggedItem);
+            }
+            soCheckAnswer();
+        } else {
+             const originalPlaceholder = Array.from(scrambledContainer.children).find(child => child.dataset.word === soDraggedItem.textContent);
+             if (originalPlaceholder) {
+                 scrambledContainer.replaceChild(soDraggedItem, originalPlaceholder);
+             } else if (soDraggedItem.parentElement !== answerContainer) {
+                 scrambledContainer.appendChild(soDraggedItem);
+             }
+             soCheckAnswer();
+        }
+      }
+
+      if (soAnswerPlaceholder) {
+        soAnswerPlaceholder.remove();
+        soAnswerPlaceholder = null;
+      }
+      soDraggedItem.style.position = '';
+      soDraggedItem.style.width = '';
+      soDraggedItem.style.height = '';
+      soDraggedItem.style.zIndex = '';
+      soDraggedItem.style.pointerEvents = '';
+      soDraggedItem.style.opacity = '';
+      soDraggedItem.style.left = '';
+      soDraggedItem.style.top = '';
+      
+      soDraggedItem = null;
+      document.removeEventListener('touchmove', soHandleTouchMove);
+      document.removeEventListener('touchend', soHandleTouchEnd);
+    }
+
+
+    function soHandleDragStart(e) {
+        soDraggedItem = this;
+        
+        if (this.parentElement === scrambledContainer) {
+            const width = this.offsetWidth;
+            const height = this.offsetHeight;
+            const placeholder = document.createElement('div');
+            placeholder.className = 'word-block placeholder';
+            placeholder.style.width = width + 'px';
+            placeholder.style.height = height + 'px';
+            placeholder.dataset.word = this.textContent;
+            
+            setTimeout(() => {
+                if (soDraggedItem === this && this.parentElement) {
+                    this.parentElement.replaceChild(placeholder, this);
+                    this.style.display = 'block';
+                }
+            }, 0);
+        } else {
+            setTimeout(() => {
+                if (soDraggedItem === this) {
+                    this.style.display = 'none';
+                }
+            }, 0);
+        }
+    }
+
+    function soHandleDragEnd() {
+        if(soDraggedItem) {
+            soDraggedItem.style.display = 'block';
+            soDraggedItem = null;
+        }
+        if (soAnswerPlaceholder) {
+            soAnswerPlaceholder.remove();
+            soAnswerPlaceholder = null;
+        }
+    }
+
+    function soHandleDragOver(e) {
+        e.preventDefault();
+        if (!soDraggedItem) return;
+
+        if (this === answerContainer) {
+            if (!soAnswerPlaceholder) {
+                soAnswerPlaceholder = document.createElement('div');
+                soAnswerPlaceholder.className = 'word-block placeholder';
+                soAnswerPlaceholder.style.width = soDraggedItem.offsetWidth + 'px';
+                soAnswerPlaceholder.style.height = soDraggedItem.offsetHeight + 'px';
+            }
+            const afterElement = soGetDragAfterElement(answerContainer, e.clientX, e.clientY);
+            if (afterElement) {
+                answerContainer.insertBefore(soAnswerPlaceholder, afterElement);
+            } else {
+                answerContainer.appendChild(soAnswerPlaceholder);
+            }
+        } else if (this === scrambledContainer && soAnswerPlaceholder) {
+            soAnswerPlaceholder.remove();
+            soAnswerPlaceholder = null;
+        }
+    }
+
+    function soGetDragAfterElement(container, x, y) {
+        const draggableElements = [...container.querySelectorAll('.word-block')];
+        
+        return draggableElements.find(child => {
+            if (child === soDraggedItem || child === soAnswerPlaceholder) return false;
+            if (child.classList.contains('placeholder')) return false;
+            const box = child.getBoundingClientRect();
+            if (box.width === 0 && box.height === 0) return false;
+
+            if (y < box.top) return true;
+            if (y > box.bottom) return false;
+            if (x < box.left + box.width / 2) return true;
+            return false;
+        });
+    }
+
+    function soHandleDrop(e) {
+        e.preventDefault();
+        if (soDraggedItem) {
+            const afterElement = soGetDragAfterElement(answerContainer, e.clientX, e.clientY);
+
+            if (this === answerContainer) {
+                if (afterElement) {
+                    answerContainer.insertBefore(soDraggedItem, afterElement);
+                } else {
+                    answerContainer.appendChild(soDraggedItem);
+                }
+            } else {
+                const originalPlaceholder = Array.from(scrambledContainer.children).find(child => child.dataset.word === soDraggedItem.textContent);
+                if (originalPlaceholder) {
+                    scrambledContainer.replaceChild(soDraggedItem, originalPlaceholder);
+                } else if (soDraggedItem.parentElement !== answerContainer) {
+                    scrambledContainer.appendChild(soDraggedItem);
+                }
+            }
+            soDraggedItem.style.display = 'block';
+            soDraggedItem = null;
+            soCheckAnswer();
+        }
+    }
+
+    scrambledContainer.addEventListener('dragend', soHandleDragEnd);
+    answerContainer.addEventListener('dragover', soHandleDragOver);
+    answerContainer.addEventListener('drop', soHandleDrop);
+    scrambledContainer.addEventListener('dragover', soHandleDragOver);
+    scrambledContainer.addEventListener('drop', soHandleDrop);
+
+    function soCheckAnswer() {
+        const words = Array.from(answerContainer.children).map(child => child.textContent);
+        const constructedSentence = words.join('');
+        const correctSentence = soSentences[soCurrentSentenceIndex].correct;
+
+        if (constructedSentence === correctSentence) {
+            feedback.textContent = currentLanguage === 'zh' ? '答對了！' : 'Correct!';
+            feedback.className = 'correct';
+            answerContainer.classList.add('shake');
+            setTimeout(() => {
+                soLoadSentence();
+                answerContainer.classList.remove('shake');
+            }, 1500);
+        } else {
+            feedback.textContent = '';
+            feedback.className = '';
+        }
+    }
+
+    retryButton.addEventListener('click', () => {
+        const answerWords = Array.from(answerContainer.children);
+        answerWords.forEach(word => {
+            const originalPlaceholder = Array.from(scrambledContainer.children).find(child => child.dataset.word === word.textContent);
+            if (originalPlaceholder) {
+                scrambledContainer.replaceChild(word, originalPlaceholder);
+            }
+        });
+        answerContainer.innerHTML = '';
+        feedback.textContent = '';
+    });
+
+    soSkipButton.addEventListener('click', () => {
+        soLoadSentence();
+    });
+
+    function generateAddNumber(digits) {
+        const min = Math.pow(10, digits - 1);
+        const max = Math.pow(10, digits) - 1;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function clearAddAnswerInputs() {
+        const inputs = Array.from(addRowAnswer.querySelectorAll('.digit-input'));
+        inputs.forEach(input => {
+            input.value = '';
+            input.readOnly = false;
+        });
+        addFeedback.textContent = '';
+        addFeedback.className = '';
+        addIsIncorrect = false;
+        if (inputs.length > 0) {
+            inputs[inputs.length - 1].focus();
+        }
+    }
+
+    function addLoadQuestion() {
+        addCurrentTop = generateAddNumber(addMDigits);
+        addCurrentBottom = generateAddNumber(addNDigits);
+        addCorrectAnswer = addCurrentTop + addCurrentBottom;
+        addIsIncorrect = false;
+
+        addFeedback.textContent = '';
+        addFeedback.className = '';
+
+        const topStr = String(addCurrentTop);
+        const bottomStr = String(addCurrentBottom);
+        const maxDigits = Math.max(topStr.length, bottomStr.length);
+
+        addRowTop.innerHTML = '';
+        topStr.split('').forEach(digit => {
+            const span = document.createElement('span');
+            span.className = 'math-digit';
+            span.textContent = digit;
+            addRowTop.appendChild(span);
+        });
+
+        addRowBottomDigits.innerHTML = '';
+        // Set fixed width to align the + operator correctly
+        addRowBottomDigits.style.width = `${maxDigits * 35}px`;
+        
+        bottomStr.split('').forEach(digit => {
+            const span = document.createElement('span');
+            span.className = 'math-digit';
+            span.textContent = digit;
+            addRowBottomDigits.appendChild(span);
+        });
+
+        const answerLength = Math.max(addMDigits, addNDigits) + 1;
+        addRowAnswer.innerHTML = '';
+        for (let i = 0; i < answerLength; i++) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.inputMode = 'numeric';
+            input.pattern = '[0-9]*';
+            input.className = 'digit-input';
+            input.maxLength = 1;
+            input.dataset.index = i;
+            
+            input.addEventListener('input', handleAddDigitInput);
+            input.addEventListener('keydown', handleAddDigitKeydown);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    checkAddAnswer();
+                }
+            });
+            input.addEventListener('focus', () => {
+                if (addIsIncorrect) {
+                    clearAddAnswerInputs();
+                }
+            });
+            input.addEventListener('click', () => {
+                if (addIsIncorrect) {
+                    clearAddAnswerInputs();
+                }
+            });
+            
+            addRowAnswer.appendChild(input);
+        }
+
+        const inputs = Array.from(addRowAnswer.querySelectorAll('.digit-input'));
+        if (inputs.length > 0) {
+            inputs[inputs.length - 1].focus();
+        }
+    }
+
+    function handleAddDigitInput(e) {
+        const input = e.target;
+        let value = input.value;
+        
+        if (value.length > 1) {
+            value = value.charAt(value.length - 1);
+            input.value = value;
+        }
+
+        if (value.length === 1) {
+            const index = parseInt(input.dataset.index);
+            if (index > 0) {
+                const prevInput = addRowAnswer.querySelector(`input[data-index="${index - 1}"]`);
+                if (prevInput) prevInput.focus();
+            }
+        }
+    }
+
+    function handleAddDigitKeydown(e) {
+        const input = e.target;
+        const index = parseInt(input.dataset.index);
+
+        if (e.key === 'Backspace' && input.value === '') {
+            e.preventDefault();
+            const nextInput = addRowAnswer.querySelector(`input[data-index="${index + 1}"]`);
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.value = '';
+            }
+        }
+    }
+
+    function checkAddAnswer() {
+        const inputs = Array.from(addRowAnswer.querySelectorAll('.digit-input'));
+        
+        let answerNumStr = '';
+        let hasValue = false;
+        
+        for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].value !== '') {
+                hasValue = true;
+                answerNumStr += inputs[i].value;
+            }
+        }
+        
+        if (!hasValue) return;
+
+        addFeedback.classList.remove('shake');
+        void addFeedback.offsetWidth;
+
+        if (parseInt(answerNumStr) === addCorrectAnswer) {
+            addFeedback.textContent = currentLanguage === 'zh' ? '答對了！' : 'Correct!';
+            addFeedback.className = 'feedback correct shake';
+            inputs.forEach(input => input.readOnly = true);
+            addIsIncorrect = false;
+            
+            setTimeout(() => {
+                addLoadQuestion();
+            }, 1500);
+        } else {
+            addFeedback.textContent = currentLanguage === 'zh' ? '再試一次！' : 'Try again!';
+            addFeedback.className = 'feedback incorrect shake';
+            addIsIncorrect = true;
+        }
+    }
+
+    addRetryButton.addEventListener('click', () => {
+        clearAddAnswerInputs();
+    });
+
+    addSkipButton.addEventListener('click', () => {
+        addLoadQuestion();
+    });
+
+    addSubmitBtn.addEventListener('click', checkAddAnswer);
+
+    function clearSubAnswerInputs() {
+        const inputs = Array.from(subRowAnswer.querySelectorAll('.digit-input'));
+        inputs.forEach(input => {
+            input.value = '';
+            input.readOnly = false;
+        });
+        subFeedback.textContent = '';
+        subFeedback.className = '';
+        subIsIncorrect = false;
+        if (inputs.length > 0) {
+            inputs[inputs.length - 1].focus();
+        }
+    }
+
+    function subLoadQuestion() {
+        const num1 = generateAddNumber(subMDigits);
+        const num2 = generateAddNumber(subNDigits);
+        subCurrentTop = Math.max(num1, num2);
+        subCurrentBottom = Math.min(num1, num2);
+        subCorrectAnswer = subCurrentTop - subCurrentBottom;
+        subIsIncorrect = false;
+
+        subFeedback.textContent = '';
+        subFeedback.className = '';
+
+        const topStr = String(subCurrentTop);
+        const bottomStr = String(subCurrentBottom);
+        const maxDigits = Math.max(topStr.length, bottomStr.length);
+
+        subRowTop.innerHTML = '';
+        topStr.split('').forEach(digit => {
+            const span = document.createElement('span');
+            span.className = 'math-digit';
+            span.textContent = digit;
+            subRowTop.appendChild(span);
+        });
+
+        subRowBottomDigits.innerHTML = '';
+        // Set fixed width to align the - operator correctly
+        subRowBottomDigits.style.width = `${maxDigits * 35}px`;
+        
+        bottomStr.split('').forEach(digit => {
+            const span = document.createElement('span');
+            span.className = 'math-digit';
+            span.textContent = digit;
+            subRowBottomDigits.appendChild(span);
+        });
+
+        const answerLength = maxDigits;
+        subRowAnswer.innerHTML = '';
+        for (let i = 0; i < answerLength; i++) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.inputMode = 'numeric';
+            input.pattern = '[0-9]*';
+            input.className = 'digit-input';
+            input.maxLength = 1;
+            input.dataset.index = i;
+            
+            input.addEventListener('input', handleSubDigitInput);
+            input.addEventListener('keydown', handleSubDigitKeydown);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    checkSubAnswer();
+                }
+            });
+            input.addEventListener('focus', () => {
+                if (subIsIncorrect) {
+                    clearSubAnswerInputs();
+                }
+            });
+            input.addEventListener('click', () => {
+                if (subIsIncorrect) {
+                    clearSubAnswerInputs();
+                }
+            });
+            
+            subRowAnswer.appendChild(input);
+        }
+
+        const inputs = Array.from(subRowAnswer.querySelectorAll('.digit-input'));
+        if (inputs.length > 0) {
+            inputs[inputs.length - 1].focus();
+        }
+    }
+
+    function handleSubDigitInput(e) {
+        const input = e.target;
+        let value = input.value;
+        
+        if (value.length > 1) {
+            value = value.charAt(value.length - 1);
+            input.value = value;
+        }
+
+        if (value.length === 1) {
+            const index = parseInt(input.dataset.index);
+            if (index > 0) {
+                const prevInput = subRowAnswer.querySelector(`input[data-index="${index - 1}"]`);
+                if (prevInput) prevInput.focus();
+            }
+        }
+    }
+
+    function handleSubDigitKeydown(e) {
+        const input = e.target;
+        const index = parseInt(input.dataset.index);
+
+        if (e.key === 'Backspace' && input.value === '') {
+            e.preventDefault();
+            const nextInput = subRowAnswer.querySelector(`input[data-index="${index + 1}"]`);
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.value = '';
+            }
+        }
+    }
+
+    function checkSubAnswer() {
+        const inputs = Array.from(subRowAnswer.querySelectorAll('.digit-input'));
+        
+        let answerNumStr = '';
+        let hasValue = false;
+        
+        for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].value !== '') {
+                hasValue = true;
+                answerNumStr += inputs[i].value;
+            }
+        }
+        
+        if (!hasValue) return;
+
+        subFeedback.classList.remove('shake');
+        void subFeedback.offsetWidth;
+
+        if (parseInt(answerNumStr) === subCorrectAnswer) {
+            subFeedback.textContent = currentLanguage === 'zh' ? '答對了！' : 'Correct!';
+            subFeedback.className = 'feedback correct shake';
+            inputs.forEach(input => input.readOnly = true);
+            subIsIncorrect = false;
+            
+            setTimeout(() => {
+                subLoadQuestion();
+            }, 1500);
+        } else {
+            subFeedback.textContent = currentLanguage === 'zh' ? '再試一次！' : 'Try again!';
+            subFeedback.className = 'feedback incorrect shake';
+            subIsIncorrect = true;
+        }
+    }
+
+    subRetryButton.addEventListener('click', () => {
+        clearSubAnswerInputs();
+    });
+
+    subSkipButton.addEventListener('click', () => {
+        subLoadQuestion();
+    });
+
+    subSubmitBtn.addEventListener('click', checkSubAnswer);
+
+    function updateSettingsLabels() {
+        if (currentGameMode === 'subtraction') {
+            labelMDigits.textContent = currentLanguage === 'zh' ? '被減數 (m):' : 'Minuend (m):';
+            labelNDigits.textContent = currentLanguage === 'zh' ? '減數 (n):' : 'Subtrahend (n):';
+        } else {
+            labelMDigits.textContent = currentLanguage === 'zh' ? '加數 1 位數 (m):' : 'Top number digits (m):';
+            labelNDigits.textContent = currentLanguage === 'zh' ? '加數 2 位數 (n):' : 'Bottom number digits (n):';
+        }
+    }
+
+    addSettingsBtn.addEventListener('click', () => {
+        if (currentGameMode === 'subtraction') {
+            mDigitsInput.value = subMDigits;
+            nDigitsInput.value = subNDigits;
+        } else {
+            mDigitsInput.value = addMDigits;
+            nDigitsInput.value = addNDigits;
+        }
+        updateSettingsLabels();
+        addSettingsModal.style.display = 'flex';
+    });
+
+    settingsCloseBtn.addEventListener('click', () => {
+        addSettingsModal.style.display = 'none';
+    });
+
+    settingsSaveBtn.addEventListener('click', () => {
+        let mVal = parseInt(mDigitsInput.value) || 3;
+        let nVal = parseInt(nDigitsInput.value) || 3;
+        
+        mVal = Math.max(1, Math.min(5, mVal));
+        nVal = Math.max(1, Math.min(5, nVal));
+        
+        mDigitsInput.value = mVal;
+        nDigitsInput.value = nVal;
+        
+        if (currentGameMode === 'subtraction') {
+            subMDigits = mVal;
+            subNDigits = nVal;
+            subLoadQuestion();
+        } else {
+            addMDigits = mVal;
+            addNDigits = nVal;
+            addLoadQuestion();
+        }
+        addSettingsModal.style.display = 'none';
+        updateUrlParams();
+    });
+
+    // Event Listeners
+    function clearSaAnswerInput() {
+        saAnswerInput.value = '';
+        saAnswerInput.readOnly = false;
+        saFeedback.textContent = '';
+        saFeedback.className = '';
+        saIsIncorrect = false;
+        saAnswerInput.focus();
+    }
+
+    function checkSaAnswer() {
+        if (saAnswerInput.value === '') return;
+        
+        const answerNum = parseInt(saAnswerInput.value);
+
+        saFeedback.classList.remove('shake');
+        void saFeedback.offsetWidth;
+
+        if (answerNum === saCorrectAnswer) {
+            saFeedback.textContent = currentLanguage === 'zh' ? '答對了！' : 'Correct!';
+            saFeedback.className = 'feedback correct shake';
+            saAnswerInput.readOnly = true;
+            saIsIncorrect = false;
+            
+            setTimeout(() => {
+                saLoadQuestion();
+            }, 1500);
+        } else {
+            saFeedback.textContent = currentLanguage === 'zh' ? '再試一次！' : 'Try again!';
+            saFeedback.className = 'feedback incorrect shake';
+            saIsIncorrect = true;
+        }
+    }
+
+    function saLoadQuestion() {
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * saQuestions.length);
+        } while (randomIndex === saCurrentQuestionIndex);
+        saCurrentQuestionIndex = randomIndex;
+
+        const questionData = saQuestions[saCurrentQuestionIndex];
+        saQuestion.textContent = questionData.question;
+        saCorrectAnswer = questionData.answer;
+        saIsIncorrect = false;
+        
+        saAnswerInput.value = '';
+        saAnswerInput.readOnly = false;
+        saFeedback.textContent = '';
+        saFeedback.className = '';
+        saAnswerInput.focus();
+    }
+
+    saAnswerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            checkSaAnswer();
+        }
+    });
+
+    saAnswerInput.addEventListener('focus', () => {
+        if (saIsIncorrect) {
+            clearSaAnswerInput();
+        }
+    });
+
+    saAnswerInput.addEventListener('click', () => {
+        if (saIsIncorrect) {
+            clearSaAnswerInput();
+        }
+    });
+
+    saSubmitBtn.addEventListener('click', checkSaAnswer);
+
+    saRetryButton.addEventListener('click', () => {
+        clearSaAnswerInput();
+    });
+
+    saSkipButton.addEventListener('click', () => {
+        saLoadQuestion();
+    });
+
+    skipBtn.addEventListener('click', () => {
+        currentMcQuestionIndex = (currentMcQuestionIndex + 1) % mcQuestions.length;
+        renderMcQuestion();
+    });
+
+    langSwitch.addEventListener('click', async () => {
+        currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+        updateTitle(currentLanguage);
+        updateCategoryOptions(currentLanguage);
+        updateGameModeOptions(currentLanguage);
+        langSwitch.textContent = currentLanguage === 'zh' ? 'English' : '中文';
+        
+        // Update MC strings
+        skipBtn.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        
+        // Update SO strings
+        retryButton.textContent = currentLanguage === 'zh' ? '重試' : 'Retry';
+        soSkipButton.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+
+        addRetryButton.textContent = currentLanguage === 'zh' ? '重試' : 'Retry';
+        addSkipButton.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        subRetryButton.textContent = currentLanguage === 'zh' ? '重試' : 'Retry';
+        subSkipButton.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        settingsTitle.textContent = currentLanguage === 'zh' ? '設定' : 'Settings';
+        updateSettingsLabels();
+        settingsSaveBtn.textContent = currentLanguage === 'zh' ? '儲存' : 'Save';
+        settingsCloseBtn.textContent = currentLanguage === 'zh' ? '取消' : 'Cancel';
+
+        if (currentGameMode === 'multiple_choice') {
+            await loadMcQuestions(currentLanguage, currentCategory);
+            currentMcQuestionIndex = 0;
+            renderMcQuestion();
+        } else if (currentGameMode === 'addition') {
+            addLoadQuestion();
+        } else if (currentGameMode === 'subtraction') {
+            subLoadQuestion();
+        } else if (currentGameMode === 'short_answer') {
+            saLoadQuestion();
+        } else {
+            // Note: Sentence order only has Chinese sentences right now, 
+            // but UI buttons can be translated.
+        }
+        
+        updateUrlParams();
+    });
+
+    categorySwitch.addEventListener('change', async (event) => {
+        currentCategory = event.target.value;
+        await loadMcQuestions(currentLanguage, currentCategory);
+        currentMcQuestionIndex = 0;
+        renderMcQuestion();
+        updateUrlParams();
+    });
+
+    gameModeSwitch.addEventListener('change', async (event) => {
+        currentGameMode = event.target.value;
+        categorySwitch.style.display = 'none';
+        addSettingsBtn.style.display = 'none';
+
+        if (currentGameMode === 'multiple_choice') {
+            categorySwitch.style.display = 'inline-block';
+            mcGameContainer.style.display = 'block';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'none';
+            await loadMcQuestions(currentLanguage, currentCategory);
+            renderMcQuestion();
+        } else if (currentGameMode === 'sentence_order') {
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'block';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'none';
+            soLoadSentence();
+        } else if (currentGameMode === 'addition') {
+            addSettingsBtn.style.display = 'inline-block';
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'block';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'none';
+            addLoadQuestion();
+        } else if (currentGameMode === 'subtraction') {
+            addSettingsBtn.style.display = 'inline-block';
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'block';
+            saGameContainer.style.display = 'none';
+            subLoadQuestion();
+        } else if (currentGameMode === 'short_answer') {
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'block';
+            saLoadQuestion();
+        }
+        updateTitle(currentLanguage);
+        updateUrlParams();
+    });
+
+    // Initialization
+    async function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+        const categoryParam = urlParams.get('category');
+        const modeParam = urlParams.get('mode');
+
+        if (langParam && ['en', 'zh'].includes(langParam)) {
+            currentLanguage = langParam;
+        }
+
+        const validCategories = ['measure_words', 'general_knowledge'];
+        if (categoryParam && validCategories.includes(categoryParam)) {
+            currentCategory = categoryParam;
+        }
+
+        const validModes = ['multiple_choice', 'sentence_order', 'addition', 'subtraction', 'short_answer'];
+        if (modeParam && validModes.includes(modeParam)) {
+            currentGameMode = modeParam;
+        }
+        
+        const mParam = parseInt(urlParams.get('m'));
+        const nParam = parseInt(urlParams.get('n'));
+        if (!isNaN(mParam) && mParam >= 1 && mParam <= 5) {
+            addMDigits = mParam;
+            subMDigits = mParam;
+        }
+        if (!isNaN(nParam) && nParam >= 1 && nParam <= 5) {
+            addNDigits = nParam;
+            subNDigits = nParam;
+        }
+
+        categorySwitch.value = currentCategory;
+        gameModeSwitch.value = currentGameMode;
+
+        updateTitle(currentLanguage);
+        updateCategoryOptions(currentLanguage);
+        updateGameModeOptions(currentLanguage);
+        langSwitch.textContent = currentLanguage === 'zh' ? 'English' : '中文';
+        
+        skipBtn.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        retryButton.textContent = currentLanguage === 'zh' ? '重試' : 'Retry';
+        soSkipButton.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        addRetryButton.textContent = currentLanguage === 'zh' ? '重試' : 'Retry';
+        addSkipButton.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        subRetryButton.textContent = currentLanguage === 'zh' ? '重試' : 'Retry';
+        subSkipButton.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        saRetryButton.textContent = currentLanguage === 'zh' ? '重試' : 'Retry';
+        saSkipButton.textContent = currentLanguage === 'zh' ? '跳過' : 'Skip';
+        settingsTitle.textContent = currentLanguage === 'zh' ? '設定' : 'Settings';
+        updateSettingsLabels();
+        settingsSaveBtn.textContent = currentLanguage === 'zh' ? '儲存' : 'Save';
+        settingsCloseBtn.textContent = currentLanguage === 'zh' ? '取消' : 'Cancel';
+        
+        categorySwitch.style.display = 'none';
+        addSettingsBtn.style.display = 'none';
+
+        if (currentGameMode === 'multiple_choice') {
+            categorySwitch.style.display = 'inline-block';
+            mcGameContainer.style.display = 'block';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'none';
+            await loadMcQuestions(currentLanguage, currentCategory);
+            renderMcQuestion();
+        } else if (currentGameMode === 'sentence_order') {
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'block';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'none';
+            soLoadSentence();
+        } else if (currentGameMode === 'addition') {
+            addSettingsBtn.style.display = 'inline-block';
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'block';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'none';
+            addLoadQuestion();
+        } else if (currentGameMode === 'subtraction') {
+            addSettingsBtn.style.display = 'inline-block';
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'block';
+            saGameContainer.style.display = 'none';
+            subLoadQuestion();
+        } else if (currentGameMode === 'short_answer') {
+            mcGameContainer.style.display = 'none';
+            soGameContainer.style.display = 'none';
+            addGameContainer.style.display = 'none';
+            subGameContainer.style.display = 'none';
+            saGameContainer.style.display = 'block';
+            saLoadQuestion();
+        }
+        
+        updateUrlParams();
+    }
+
+    init();
+});
+</script>
+</body>
+</html>
